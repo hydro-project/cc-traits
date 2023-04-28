@@ -3,19 +3,9 @@ use cc_traits::{Back, Collection, PushBack};
 use std::collections::VecDeque;
 
 /// Ordered stack.
+#[derive(Default)]
 pub struct Ordered<S> {
 	inner: S,
-}
-
-impl<S> Ordered<S> {
-	pub fn new() -> Self
-	where
-		S: Default,
-	{
-		Ordered {
-			inner: S::default(),
-		}
-	}
 }
 
 impl<S> Ordered<S> {
@@ -48,7 +38,7 @@ fn main() {
 		S: Default + Collection<Item = i32> + Back + PushBack,
 		for<'a> S::ItemRef<'a>: PartialOrd<&'a i32>,
 	{
-		let mut ordered: Ordered<S> = Ordered::new();
+		let mut ordered: Ordered<S> = Ordered::default();
 		assert!(ordered.try_push(1).is_ok());
 		assert!(ordered.try_push(2).is_ok());
 		assert!(ordered.try_push(0).is_err());
