@@ -1,3 +1,5 @@
+use cc_traits_derive::derive_external;
+
 use crate::{
 	Clear, Collection, CollectionMut, CollectionRef, Get, GetKeyValue, GetMut, Iter, Keyed,
 	KeyedRef, Len, MapInsert, MapIter, MapIterMut, Remove, SimpleCollectionMut,
@@ -5,65 +7,15 @@ use crate::{
 };
 use std::{borrow::Borrow, collections::HashMap, hash::Hash};
 
-impl<K, V> Collection for HashMap<K, V> {
-	type Item = V;
-}
+derive_external! {
+	#[derive(Collection, CollectionRef, CollectionMut)]
+	#[derive(SimpleCollectionRef, SimpleCollectionMut)]
+	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Len)]
+	struct HashMap<K, V> {}
 
-impl<K, V> CollectionRef for HashMap<K, V> {
-	type ItemRef<'a> = &'a V where Self: 'a;
-
-	crate::covariant_item_ref!();
-}
-
-impl<K, V> CollectionMut for HashMap<K, V> {
-	type ItemMut<'a> = &'a mut V where Self: 'a;
-
-	crate::covariant_item_mut!();
-}
-
-impl<K, V> SimpleCollectionRef for HashMap<K, V> {
-	crate::simple_collection_ref!();
-}
-
-impl<K, V> SimpleCollectionMut for HashMap<K, V> {
-	crate::simple_collection_mut!();
-}
-
-impl<K, V> Keyed for HashMap<K, V> {
-	type Key = K;
-}
-
-impl<K, V> KeyedRef for HashMap<K, V> {
-	type KeyRef<'a> = &'a K where Self: 'a;
-
-	crate::covariant_key_ref!();
-}
-
-impl<K, V> SimpleKeyedRef for HashMap<K, V> {
-	crate::simple_keyed_ref!();
-}
-
-impl<K, V> Len for HashMap<K, V> {
-	#[inline(always)]
-	fn len(&self) -> usize {
-		self.len()
-	}
-
-	#[inline(always)]
-	fn is_empty(&self) -> bool {
-		self.is_empty()
-	}
-}
-
-impl<'a, Q, K: Hash + Eq, V> Get<&'a Q> for HashMap<K, V>
-where
-	K: Borrow<Q>,
-	Q: Hash + Eq + ?Sized,
-{
-	#[inline(always)]
-	fn get(&self, key: &'a Q) -> Option<&V> {
-		self.get(key)
-	}
+	#[derive(Get)]
+	struct HashMap<K: Hash + Eq, V> {}
 }
 
 impl<'a, Q, K: Hash + Eq, V> GetMut<&'a Q> for HashMap<K, V>
