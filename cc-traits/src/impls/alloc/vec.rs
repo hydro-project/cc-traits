@@ -1,50 +1,11 @@
-use crate::{
-	Capacity, Clear, Collection, CollectionMut, CollectionRef, Get, GetMut, Iter, IterMut, Len,
-	PopBack, PushBack, Remove, Reserve, SimpleCollectionMut, SimpleCollectionRef, WithCapacity,
-};
+use crate::{derive_external, Get, GetMut, Iter, IterMut, PopBack, PushBack, Remove};
 use alloc::vec::Vec;
 
-impl<T> Collection for Vec<T> {
-	type Item = T;
-}
-
-impl<T> CollectionRef for Vec<T> {
-	type ItemRef<'a> = &'a T where Self: 'a;
-
-	crate::covariant_item_ref!();
-}
-
-impl<T> CollectionMut for Vec<T> {
-	type ItemMut<'a> = &'a mut T where Self: 'a;
-
-	crate::covariant_item_mut!();
-}
-
-impl<T> SimpleCollectionRef for Vec<T> {
-	crate::simple_collection_ref!();
-}
-
-impl<T> SimpleCollectionMut for Vec<T> {
-	crate::simple_collection_mut!();
-}
-
-impl<T> WithCapacity for Vec<T> {
-	#[inline(always)]
-	fn with_capacity(capacity: usize) -> Self {
-		Vec::with_capacity(capacity)
-	}
-}
-
-impl<T> Len for Vec<T> {
-	#[inline(always)]
-	fn len(&self) -> usize {
-		self.len()
-	}
-
-	#[inline(always)]
-	fn is_empty(&self) -> bool {
-		self.is_empty()
-	}
+derive_external! {
+	#[derive(Collection, CollectionRef, CollectionMut)]
+	#[derive(SimpleCollectionRef, SimpleCollectionMut)]
+	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
+	struct Vec<T>;
 }
 
 impl<T> Get<usize> for Vec<T> {
@@ -58,20 +19,6 @@ impl<T> GetMut<usize> for Vec<T> {
 	#[inline(always)]
 	fn get_mut(&mut self, index: usize) -> Option<&mut T> {
 		self.as_mut_slice().get_mut(index)
-	}
-}
-
-impl<T> Capacity for Vec<T> {
-	#[inline(always)]
-	fn capacity(&self) -> usize {
-		self.capacity()
-	}
-}
-
-impl<T> Reserve for Vec<T> {
-	#[inline(always)]
-	fn reserve(&mut self, additional: usize) {
-		self.reserve(additional)
 	}
 }
 
@@ -101,14 +48,6 @@ impl<T> Remove<usize> for Vec<T> {
 		}
 	}
 }
-
-impl<T> Clear for Vec<T> {
-	#[inline(always)]
-	fn clear(&mut self) {
-		self.clear()
-	}
-}
-
 impl<T> Iter for Vec<T> {
 	type Iter<'a> = core::slice::Iter<'a, T> where Self: 'a;
 

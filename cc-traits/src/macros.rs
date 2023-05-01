@@ -1,6 +1,3 @@
-#[doc(inline)]
-pub use cc_traits_derive::*;
-
 /// Automatically defines the `CollectionRef::upcast_item_ref` function using the
 /// covariance of the `ItemRef<'a>` type with regards to `'a`.
 ///

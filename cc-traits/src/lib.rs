@@ -121,6 +121,9 @@ extern crate core;
 mod impls;
 mod macros;
 
+#[doc(inline)]
+pub use cc_traits_derive::*;
+
 #[cfg(feature = "nightly")]
 mod alias;
 #[cfg(feature = "nightly")]
