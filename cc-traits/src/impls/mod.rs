@@ -7,6 +7,9 @@ mod std;
 #[cfg(feature = "slab")]
 mod slab;
 
+#[cfg(feature = "slotmap")]
+mod slotmap;
+
 #[cfg(feature = "smallvec")]
 mod smallvec;
 

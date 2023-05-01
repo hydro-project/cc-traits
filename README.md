@@ -109,6 +109,7 @@ Here are the supported crates:
 
   - [`slab`](https://crates.io/crates/slab) providing the `Slab` collection.
   - [`smallvec`](https://crates.io/crates/smallvec) providing the `SmallVec` collection.
+  - [`slotmap`](https://crates.io/crates/slotmap) providing the `SlotMap`, `DenseSlotMap`, `HopSlotMap`, `SecondaryMap`, and `SparseSecondaryMap` collections.
   - [`serde_json`](https://crates.io/crates/serde_json) providing the `Map<String, Value>` collection for JSON objects.
   - [`ijson`](https://crates.io/crates/ijson) providing the `IObject` and `IArray` collections.
 

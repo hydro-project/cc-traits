@@ -1,4 +1,4 @@
-use crate::{derive_external, Iter, MapIter, MapIterMut};
+use crate::{derive_external, Iter, IterMut, MapIter, MapIterMut};
 
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -21,6 +21,15 @@ impl<K, V> Iter for HashMap<K, V> {
 	#[inline(always)]
 	fn iter(&self) -> Self::Iter<'_> {
 		self.values()
+	}
+}
+
+impl<K, V> IterMut for HashMap<K, V> {
+	type IterMut<'a> = std::collections::hash_map::ValuesMut<'a, K, V> where Self: 'a;
+
+	#[inline(always)]
+	fn iter_mut(&mut self) -> Self::IterMut<'_> {
+		self.values_mut()
 	}
 }
 

@@ -1,2 +1,2 @@
-mod hashmap;
-mod hashset;
+mod hash_map;
+mod hash_set;

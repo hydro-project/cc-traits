@@ -16,11 +16,12 @@ default = ["alloc", "std"]
 alloc = []
 std = []
 nightly = []
-all-impls = ["slab", "smallvec", "serde_json", "ijson"]
+all-impls = ["slab", "slotmap", "smallvec", "serde_json", "ijson"]
 
 [dependencies]
 cc-traits-derive = { path = "../cc-traits-derive" }
 slab = { version = "^0.4", optional = true }
+slotmap = { version = "^1.0.0", optional = true }
 smallvec = { version = "^1.6", optional = true }
 serde_json = { version = "^1.0.71", optional = true }
 ijson = { version = "^0.1", optional = true }
