@@ -259,7 +259,7 @@ fn with_capacity(item: &DeriveInput) -> proc_macro::TokenStream {
 	.into()
 }
 
-#[proc_macro_derive(RFeserve)]
+#[proc_macro_derive(Reserve)]
 pub fn derive_reserve(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 	reserve(&parse_macro_input!(input as DeriveInput))
 }
