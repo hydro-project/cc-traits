@@ -1,11 +1,8 @@
-use cc_traits_derive::derive_external;
-
-use crate::{
-	Clear, Collection, CollectionMut, CollectionRef, Get, GetKeyValue, GetMut, Iter, Keyed,
-	KeyedRef, Len, MapInsert, MapIter, MapIterMut, Remove, SimpleCollectionMut,
-	SimpleCollectionRef, SimpleKeyedRef,
-};
-use std::{borrow::Borrow, collections::HashMap, hash::Hash};
+use crate::macros::derive_external;
+use crate::{Clear, GetKeyValue, Iter, MapInsert, MapIter, MapIterMut, Remove};
+use std::borrow::Borrow;
+use std::collections::HashMap;
+use std::hash::Hash;
 
 derive_external! {
 	#[derive(Collection, CollectionRef, CollectionMut)]
@@ -14,19 +11,8 @@ derive_external! {
 	#[derive(Len)]
 	struct HashMap<K, V> {}
 
-	#[derive(Get)]
+	#[derive(Get, GetMut)]
 	struct HashMap<K: Hash + Eq, V> {}
-}
-
-impl<'a, Q, K: Hash + Eq, V> GetMut<&'a Q> for HashMap<K, V>
-where
-	K: Borrow<Q>,
-	Q: Hash + Eq + ?Sized,
-{
-	#[inline(always)]
-	fn get_mut(&mut self, key: &'a Q) -> Option<&mut V> {
-		self.get_mut(key)
-	}
 }
 
 impl<'a, Q, K: Hash + Eq, V> GetKeyValue<&'a Q> for HashMap<K, V>

@@ -6,7 +6,7 @@ use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::{
 	parse_macro_input, parse_quote, AttrStyle, DeriveInput, File, GenericParam, Generics, Ident,
-	LifetimeParam, MacroDelimiter, Token, Type, TypePath, WherePredicate,
+	LifetimeParam, MacroDelimiter, Path, Token, Type, TypeParam, TypePath, WherePredicate,
 };
 
 fn root() -> Ident {
@@ -33,6 +33,24 @@ macro_rules! syn_unwrap {
 			Err(err) => return err.to_compile_error().into(),
 		}
 	};
+}
+
+fn generics_key_param(generics: &Generics) -> Option<&TypeParam> {
+	generics.type_params().next()
+}
+
+fn generics_key_ident(generics: &Generics) -> Option<&Ident> {
+	generics_key_param(generics).map(|type_param| &type_param.ident)
+}
+
+fn generics_item_param(generics: &Generics) -> Option<&TypeParam> {
+	let mut type_params = generics.type_params();
+	let first = type_params.next();
+	let second = type_params.next();
+	second.or(first)
+}
+fn generics_item_ident(generics: &Generics) -> Option<&Ident> {
+	generics_item_param(generics).map(|type_param| &type_param.ident)
 }
 
 #[proc_macro]
@@ -73,6 +91,7 @@ pub fn derive_external(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 							"SimpleKeyedRef" => simple_keyed_ref(&item),
 							"Len" => len(&item),
 							"Get" => get(&item),
+							"GetMut" => get_mut(&item),
 							unknown => return compile_error(unknown, "Cannot derive unknown trait. This macro only works for traits from cc-traits."),
 						})
 						.collect()
@@ -90,13 +109,13 @@ fn collection(item: &DeriveInput) -> proc_macro::TokenStream {
 	let root = root();
 	let name = &item.ident;
 	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-	let Some(item_generic) = item.generics.params.last() else {
+	let Some(item_ident) = generics_item_ident(&item.generics) else {
 		return compile_error(item, "`Collection`: Item must have at least one generic argument, to be used as the `Item`.");
 	};
 
 	quote! {
 		impl #impl_generics #root::Collection for #name #type_generics #where_clause {
-			type Item = #item_generic;
+			type Item = #item_ident;
 		}
 	}
 	.into()
@@ -110,13 +129,13 @@ fn collection_ref(item: &DeriveInput) -> proc_macro::TokenStream {
 	let root = root();
 	let name = &item.ident;
 	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-	let Some(item_generic) = item.generics.params.last() else {
+	let Some(item_ident) = generics_item_ident(&item.generics) else {
 		return compile_error(item, "`CollectionRef`: Item must have at least one generic argument, to be used as the `Item`.");
 	};
 
 	quote! {
 		impl #impl_generics #root::CollectionRef for #name #type_generics #where_clause {
-			type ItemRef<'a> = &'a #item_generic where Self: 'a;
+			type ItemRef<'a> = &'a #item_ident where Self: 'a;
 
 			#root::covariant_item_ref!();
 		}
@@ -132,13 +151,13 @@ fn collection_mut(item: &DeriveInput) -> proc_macro::TokenStream {
 	let root = root();
 	let name = &item.ident;
 	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-	let Some(item_generic) = item.generics.params.last() else {
+	let Some(item_ident) = generics_item_ident(&item.generics) else {
 		return compile_error(item, "`CollectionMut`: Item must have at least one generic argument, to be used as the `Item`.");
 	};
 
 	quote! {
 		impl #impl_generics #root::CollectionMut for #name #type_generics #where_clause {
-			type ItemMut<'a> = &'a mut #item_generic where Self: 'a;
+			type ItemMut<'a> = &'a mut #item_ident where Self: 'a;
 
 			#root::covariant_item_mut!();
 		}
@@ -188,13 +207,13 @@ fn keyed(item: &DeriveInput) -> proc_macro::TokenStream {
 	let root = root();
 	let name = &item.ident;
 	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-	let Some(key_generic) = item.generics.params.first() else {
+	let Some(key_ident) = generics_key_ident(&item.generics) else {
 		return compile_error(item, "`Keyed`: Item must have at least one generic argument, to be used as the `Key`.");
 	};
 
 	quote! {
 		impl #impl_generics #root::Keyed for #name #type_generics #where_clause {
-			type Key = #key_generic;
+			type Key = #key_ident;
 		}
 	}
 	.into()
@@ -208,13 +227,13 @@ fn keyed_ref(item: &DeriveInput) -> proc_macro::TokenStream {
 	let root = root();
 	let name = &item.ident;
 	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-	let Some(key_generic) = item.generics.params.first() else {
+	let Some(key_ident) = generics_key_ident(&item.generics) else {
 		return compile_error(item, "`KeyedRef`: Item must have at least one generic argument, to be used as the `Key`.");
 	};
 
 	quote! {
 		impl #impl_generics #root::KeyedRef for #name #type_generics #where_clause {
-			type KeyRef<'a> = &'a #key_generic where Self: 'a;
+			type KeyRef<'a> = &'a #key_ident where Self: 'a;
 
 			#root::covariant_key_ref!();
 		}
@@ -273,17 +292,17 @@ fn get(item: &DeriveInput) -> proc_macro::TokenStream {
 	let name = &item.ident;
 	let (_impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
 
-	let Some(key_generic) = item.generics.type_params().next() else {
-		return compile_error(item, "`KeyedRef`: Item must have at least one generic argument, to be used as the `Key`.");
+	let Some(key_param) = generics_key_param(&item.generics) else {
+		return compile_error(item, "`Get`: Item must have at least one generic argument, to be used as the `Key`.");
 	};
 
 	let params = &item.generics.params;
 	let predicates = where_clause.map(|wc| &wc.predicates);
 	let key_type = Type::Path(TypePath {
 		qself: None,
-		path: key_generic.ident.clone().into(),
+		path: key_param.ident.clone().into(),
 	});
-	let key_bounds = &key_generic.bounds;
+	let key_bounds = &key_param.bounds;
 	let key_predicates = predicates
 		.into_iter()
 		.flatten()
@@ -316,17 +335,62 @@ fn get(item: &DeriveInput) -> proc_macro::TokenStream {
 				self.get(key)
 			}
 		}
-		// impl #impl_generics #root::Len for #name #type_generics #where_clause {
-		// 	#[inline(always)]
-		// 	fn len(&self) -> usize {
-		// 		self.len()
-		// 	}
+	}
+	.into()
+}
 
-		// 	#[inline(always)]
-		// 	fn is_empty(&self) -> bool {
-		// 		self.is_empty()
-		// 	}
-		// }
+#[proc_macro_derive(GetMut)]
+pub fn derive_get_mut(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+	get_mut(&parse_macro_input!(input as DeriveInput))
+}
+fn get_mut(item: &DeriveInput) -> proc_macro::TokenStream {
+	let root = root();
+	let name = &item.ident;
+	let (_impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
+
+	let Some(key_param) = generics_key_param(&item.generics) else {
+		return compile_error(item, "`GetMut`: Item must have at least one generic argument, to be used as the `Key`.");
+	};
+
+	let params = &item.generics.params;
+	let predicates = where_clause.map(|wc| &wc.predicates);
+	let key_type = Type::Path(TypePath {
+		qself: None,
+		path: key_param.ident.clone().into(),
+	});
+	let key_bounds = &key_param.bounds;
+	let key_predicates = predicates
+		.into_iter()
+		.flatten()
+		.flat_map(|pred| match pred {
+			WherePredicate::Lifetime(_) => None,
+			WherePredicate::Type(pred_type) => Some(pred_type),
+			_ => panic!(),
+		})
+		.filter(|&pred_type| &key_type == &pred_type.bounded_ty)
+		.cloned()
+		.map(|mut pred_type| {
+			pred_type.bounded_ty = parse_quote!(__Q);
+			pred_type
+		});
+	let mut augmented_generics: Generics = parse_quote!(<'__a, __Q: #key_bounds, #params>);
+	augmented_generics.where_clause = parse_quote! {
+		where
+			#key_type: ::std::borrow::Borrow<__Q>,
+			__Q: ?Sized,
+			#( #key_predicates, )*
+			#predicates
+	};
+	let (impl_generics, _type_generics, where_clause) = augmented_generics.split_for_impl();
+
+	quote! {
+		impl #impl_generics #root::GetMut<&'__a __Q> for #name #type_generics #where_clause
+		{
+			#[inline(always)]
+			fn get_mut(&mut self, key: &'__a __Q) -> Option<Self::ItemMut<'_>> {
+				self.get_mut(key)
+			}
+		}
 	}
 	.into()
 }
