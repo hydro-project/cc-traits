@@ -5,7 +5,7 @@ use std::hash::Hash;
 
 derive_external! {
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Keyed, KeyedRef)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct HashMap<K, V>;
 

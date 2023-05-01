@@ -4,27 +4,27 @@ use crate::{derive_external, Get, GetMut, Insert, Iter, IterMut, MapInsert, Remo
 
 derive_external! {
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Keyed, KeyedRef)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct SlotMap<K: Key, V>;
 
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Keyed, KeyedRef)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct DenseSlotMap<K: Key, V>;
 
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Keyed, KeyedRef)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct HopSlotMap<K: Key, V>;
 
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Keyed, KeyedRef)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct SecondaryMap<K: Key, V>;
 
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(Keyed, KeyedRef, SimpleKeyedRef)]
+	#[derive(Keyed, KeyedRef)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct SparseSecondaryMap<K: Key, V>;
 }

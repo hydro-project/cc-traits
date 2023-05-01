@@ -128,7 +128,6 @@ pub fn derive_external(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 							"Reserve" => reserve(&item),
 							"Keyed" => keyed(&item),
 							"KeyedRef" => keyed_ref(&item),
-							"SimpleKeyedRef" => simple_keyed_ref(&item),
 							"Len" => len(&item),
 							"Get" => get(&item),
 							"GetMut" => get_mut(&item),
@@ -317,20 +316,7 @@ fn keyed_ref(item: &DeriveInput) -> proc_macro::TokenStream {
 
 			#root::covariant_key_ref!();
 		}
-	}
-	.into()
-}
 
-#[proc_macro_derive(SimpleKeyedRef)]
-pub fn derive_simple_keyed_ref(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-	simple_keyed_ref(&parse_macro_input!(input as DeriveInput))
-}
-fn simple_keyed_ref(item: &DeriveInput) -> proc_macro::TokenStream {
-	let root = root();
-	let name = &item.ident;
-	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-
-	quote! {
 		impl #impl_generics #root::SimpleKeyedRef for #name #type_generics #where_clause {
 			#root::simple_keyed_ref!();
 		}
