@@ -123,8 +123,6 @@ pub fn derive_external(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 							"Collection" => collection(&item),
 							"CollectionRef" => collection_ref(&item),
 							"CollectionMut" => collection_mut(&item),
-							"SimpleCollectionRef" => simple_collection_ref(&item),
-							"SimpleCollectionMut" => simple_collection_mut(&item),
 							"Capacity" => capacity(&item),
 							"WithCapacity" => with_capacity(&item),
 							"Reserve" => reserve(&item),
@@ -187,6 +185,10 @@ fn collection_ref(item: &DeriveInput) -> proc_macro::TokenStream {
 
 			#root::covariant_item_ref!();
 		}
+
+		impl #impl_generics #root::SimpleCollectionRef for #name #type_generics #where_clause {
+			#root::simple_collection_ref!();
+		}
 	}
 	.into()
 }
@@ -209,39 +211,9 @@ fn collection_mut(item: &DeriveInput) -> proc_macro::TokenStream {
 
 			#root::covariant_item_mut!();
 		}
-	}
-	.into()
-}
 
-#[proc_macro_derive(SimpleCollectionMut)]
-pub fn derive_simple_collection_mut(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-	simple_collection_mut(&parse_macro_input!(input as DeriveInput))
-}
-fn simple_collection_mut(item: &DeriveInput) -> proc_macro::TokenStream {
-	let root = root();
-	let name = &item.ident;
-	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-
-	quote! {
 		impl #impl_generics #root::SimpleCollectionMut for #name #type_generics #where_clause {
 			#root::simple_collection_mut!();
-		}
-	}
-	.into()
-}
-
-#[proc_macro_derive(SimpleCollectionRef)]
-pub fn derive_simple_collection_ref(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-	simple_collection_ref(&parse_macro_input!(input as DeriveInput))
-}
-fn simple_collection_ref(item: &DeriveInput) -> proc_macro::TokenStream {
-	let root = root();
-	let name = &item.ident;
-	let (impl_generics, type_generics, where_clause) = item.generics.split_for_impl();
-
-	quote! {
-		impl #impl_generics #root::SimpleCollectionRef for #name #type_generics #where_clause {
-			#root::simple_collection_ref!();
 		}
 	}
 	.into()

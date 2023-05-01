@@ -3,7 +3,6 @@ use alloc::collections::VecDeque;
 
 derive_external! {
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(SimpleCollectionRef, SimpleCollectionMut)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct VecDeque<T>;
 }

@@ -3,7 +3,6 @@ use slab::Slab;
 
 derive_external! {
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(SimpleCollectionRef, SimpleCollectionMut)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct Slab<T>;
 }

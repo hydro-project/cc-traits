@@ -3,7 +3,6 @@ use alloc::collections::BinaryHeap;
 
 derive_external! {
 	#[derive(Collection, CollectionRef, CollectionMut)]
-	#[derive(SimpleCollectionRef, SimpleCollectionMut)]
 	#[derive(Capacity, WithCapacity, Reserve, Len, Clear)]
 	struct BinaryHeap<T>;
 }
