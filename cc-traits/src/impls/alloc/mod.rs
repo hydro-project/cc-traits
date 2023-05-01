@@ -1,5 +1,5 @@
 mod binary_heap;
-mod btreemap;
-mod btreeset;
-mod deque;
+mod btree_map;
+mod btree_set;
+mod vec_deque;
 mod vec;

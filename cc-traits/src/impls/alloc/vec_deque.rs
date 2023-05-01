@@ -1,4 +1,4 @@
-use crate::{derive_external, Back, BackMut, Front, FrontMut, PopBack, PushBack};
+use crate::{derive_external, Get, GetMut, PopBack, PopFront, PushBack, PushFront};
 use alloc::collections::VecDeque;
 
 derive_external! {
@@ -8,31 +8,33 @@ derive_external! {
 	struct VecDeque<T>;
 }
 
-impl<T> Front for VecDeque<T> {
+impl<T> Get<usize> for VecDeque<T> {
 	#[inline(always)]
-	fn front(&self) -> Option<&T> {
-		self.front()
+	fn get(&self, index: usize) -> Option<&T> {
+		self.get(index)
 	}
 }
 
-impl<T> FrontMut for VecDeque<T> {
+impl<T> GetMut<usize> for VecDeque<T> {
 	#[inline(always)]
-	fn front_mut(&mut self) -> Option<&mut T> {
-		self.front_mut()
+	fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+		self.get_mut(index)
 	}
 }
 
-impl<T> Back for VecDeque<T> {
+impl<T> PushFront for VecDeque<T> {
+	type Output = ();
+
 	#[inline(always)]
-	fn back(&self) -> Option<&T> {
-		self.back()
+	fn push_front(&mut self, t: T) {
+		self.push_front(t)
 	}
 }
 
-impl<T> BackMut for VecDeque<T> {
+impl<T> PopFront for VecDeque<T> {
 	#[inline(always)]
-	fn back_mut(&mut self) -> Option<&mut T> {
-		self.back_mut()
+	fn pop_front(&mut self) -> Option<T> {
+		self.pop_front()
 	}
 }
 
